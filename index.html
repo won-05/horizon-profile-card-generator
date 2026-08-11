@@ -65,11 +65,9 @@
       display: flex;
       gap: 10px;
     }
-    .form-row .form-group {
-      flex: 1;
-    }
+    .form-row .form-group { flex: 1; }
 
-    /* 서식 툴바 */
+    /* 텍스트 포맷팅 서식 툴바 */
     .fmt-toolbar {
       display: flex;
       align-items: center;
@@ -87,10 +85,8 @@
       font-weight: bold;
       transition: all 0.15s;
     }
-    .fmt-btn:hover {
-      background: #3b82f6;
-      color: #fff;
-    }
+    .fmt-btn:hover { background: #3b82f6; color: #fff; }
+    
     .color-picker-wrapper {
       display: flex;
       align-items: center;
@@ -137,10 +133,7 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .theme-btn.active {
-      background: #3b82f6;
-      color: #fff;
-    }
+    .theme-btn.active { background: #3b82f6; color: #fff; }
     
     .btn-group {
       display: flex;
@@ -159,11 +152,14 @@
     }
     .save-btn { background: #3b82f6; color: white; }
     .copy-btn { background: #10b981; color: white; }
+
     .close-btn { 
       background: #ef4444; 
       color: white; 
       margin-top: 10px;
+      transition: background 0.2s;
     }
+    .close-btn:hover { background: #dc2626; }
 
     .toast {
       position: fixed;
@@ -183,7 +179,7 @@
     }
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    /* 모바일 저장 팝업 레이어 */
+    /* 모바일 이미지 저장 팝업 레이어 */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -204,6 +200,7 @@
       text-align: center;
       overflow-y: auto;
       border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
     .modal-close-icon {
       position: absolute;
@@ -212,6 +209,7 @@
       font-size: 20px;
       color: #8a96a8;
       cursor: pointer;
+      line-height: 1;
     }
     .modal-content img {
       max-width: 100%;
@@ -223,6 +221,7 @@
       font-size: 13px;
       color: #aaa;
       margin-bottom: 15px;
+      margin-top: 10px;
     }
 
     /* 미리보기 영역 */
@@ -238,11 +237,11 @@
     #card-wrapper {
       width: 580px;
       max-width: 100%;
-      overflow: hidden;
     }
 
     #card-container {
       width: 580px;
+      box-sizing: border-box;
       transition: transform 0.2s ease;
       transform-origin: top left;
     }
@@ -260,10 +259,7 @@
     }
 
     /* 센티넬 테마 */
-    .theme-sentinel {
-      background: #0d1017;
-      color: #b0b9cc;
-    }
+    .theme-sentinel { background: #0d1017; color: #b0b9cc; }
     .theme-sentinel .c-accent-bar { background: #555; }
     .theme-sentinel .c-border { border-color: rgba(255,255,255,0.08); }
     .theme-sentinel .c-title { color: #ffffff; }
@@ -278,10 +274,7 @@
     .theme-sentinel .c-highlight-box { background: rgba(255,255,255,0.05); border-left: 3px solid #666; color: #fff; }
 
     /* 가이드 테마 */
-    .theme-guide {
-      background: #f9f9f9;
-      color: #333;
-    }
+    .theme-guide { background: #f9f9f9; color: #333; }
     .theme-guide .c-accent-bar { background: #ddd; }
     .theme-guide .c-border { border-color: rgba(0,0,0,0.1); }
     .theme-guide .c-title { color: #000000; }
@@ -306,6 +299,7 @@
       .preview-pane {
         flex: 1 1 100%;
         padding: 0;
+        overflow-x: hidden;
       }
     }
   </style>
@@ -470,24 +464,25 @@
               <img id="target-banner" style="width:100%;height:auto;display:none;max-height:230px;object-fit:cover;">
               <div id="banner-placeholder" class="img-placeholder c-label">배너 이미지를 등록하세요</div>
             </div>
-            <div class="c-label" style="font-size:9px;letter-spacing:1px;margin-top:8px;overflow:hidden;">
-              <span id="target-sys-left" style="float:left;">▲ SYS_00</span><span style="float:right;">▼ SYS.LNK</span>
-              <div style="text-align:center;font-size:8px;">ANALYZING AETHER...</div>
+            <div class="c-label" style="font-size:9px;letter-spacing:1px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+              <span id="target-sys-left">▲ SYS_00</span>
+              <span style="font-size:8px;">ANALYZING AETHER...</span>
+              <span>▼ SYS.LNK</span>
             </div>
           </div>
 
           <!-- 프로필 & 기본 정보 -->
-          <div style="display:flex;flex-wrap:wrap;gap:15px;margin-bottom:20px;">
-            <div class="c-box-bg" style="flex:1 1 130px;max-width:100%;padding:12px;border-radius:10px;text-align:center;">
+          <div style="display:flex;flex-wrap:nowrap;gap:15px;margin-bottom:20px;">
+            <div class="c-box-bg" style="width:145px;flex-shrink:0;padding:12px;border-radius:10px;text-align:center;">
               <div style="width:105px;height:140px;margin:0 auto 8px auto;position:relative;">
                 <img id="target-profile" style="width:100%;height:100%;border-radius:6px;object-fit:cover;display:none;">
                 <div id="profile-placeholder" class="img-placeholder c-label" style="height:100%;">프로필 이미지</div>
               </div>
-              <div id="target-subname" class="c-val" style="font-size:14px;font-weight:bold;letter-spacing:1px;margin-bottom:4px;">NAME</div>
-              <span id="target-subclass" class="c-tag" style="font-size:9px;font-weight:bold;padding:4px 8px;border-radius:4px;display:inline-block;line-height:1.3;word-break:break-word;">[CLASS]</span>
+              <div id="target-subname" class="c-val" style="font-size:14px;font-weight:bold;letter-spacing:1px;margin-bottom:6px;word-break:break-all;">NAME</div>
+              <span id="target-subclass" class="c-tag" style="font-size:9px;font-weight:bold;padding:4px 8px;border-radius:4px;display:inline-block;line-height:1.3;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;">[CLASS]</span>
             </div>
 
-            <div class="c-box-soft" style="flex:2 1 300px;padding:15px;border-radius:10px;font-size:13px;line-height:1.6;display:flex;flex-direction:column;justify-content:center;">
+            <div class="c-box-soft" style="flex:1;min-width:0;padding:15px;border-radius:10px;font-size:13px;line-height:1.6;display:flex;flex-direction:column;justify-content:center;">
               <div class="c-border" style="padding-bottom:6px;border-bottom-width:1px;border-bottom-style:solid;">
                 <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">GENDER</b><span id="target-gender" class="c-val"></span>
               </div>
@@ -518,14 +513,14 @@
             <span id="target-management" class="c-val-sub" style="display:block;white-space:pre-line;">[관리 기록 및 운용 로그를 입력하세요]</span>
           </div>
 
-          <!-- STORY LOG -->
+          <!-- STORY LOG (텍스트 겹침 보완) -->
           <div class="c-box-bg" style="padding:20px;border-radius:10px;margin-bottom:20px;">
             <div class="c-border" style="border-bottom-width:1px;border-bottom-style:solid;padding-bottom:10px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-end;">
-              <div>
-                <span class="c-label" style="font-size:9px;letter-spacing:1px;display:block;margin-bottom:4px;line-height:1;">DOCUMENT DOSSIER</span>
-                <b class="c-title" style="font-size:18px;line-height:1;display:block;">STORY LOG</b>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <span class="c-label" style="font-size:9px;letter-spacing:1px;line-height:1;">DOCUMENT DOSSIER</span>
+                <b class="c-title" style="font-size:18px;line-height:1;">STORY LOG</b>
               </div>
-              <div class="c-label" style="font-size:10px;line-height:1;">
+              <div class="c-label" style="font-size:10px;line-height:1;white-space:nowrap;">
                 FILE: <span id="target-file-doc">DOC</span> // <span class="c-val" style="font-weight:bold;">RESTRICTED</span>
               </div>
             </div>
@@ -540,12 +535,12 @@
           </div>
 
           <!-- DATA.01 & DATA.02 -->
-          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:25px;">
-            <div class="c-box-bg" style="flex:1 1 250px;padding:14px;border-radius:8px;">
+          <div style="display:flex;flex-wrap:nowrap;gap:12px;margin-bottom:25px;">
+            <div class="c-box-bg" style="flex:1;padding:14px;border-radius:8px;">
               <b class="c-label" style="font-size:11px;display:block;margin-bottom:6px;letter-spacing:0.5px;">// DATA.01</b>
               <div id="target-data1" class="c-val-sub" style="font-size:12px;line-height:1.6;white-space:pre-line;">[추가 세부 데이터 01]</div>
             </div>
-            <div class="c-box-bg" style="flex:1 1 250px;padding:14px;border-radius:8px;">
+            <div class="c-box-bg" style="flex:1;padding:14px;border-radius:8px;">
               <b class="c-label" style="font-size:11px;display:block;margin-bottom:6px;letter-spacing:0.5px;">// DATA.02</b>
               <div id="target-data2" class="c-val-sub" style="font-size:12px;line-height:1.6;white-space:pre-line;">[추가 세부 데이터 02]</div>
             </div>
@@ -601,6 +596,7 @@
 
     function updateText() {
       const getVal = id => document.getElementById(id).value;
+      
       const mainClass = getVal('input-class').trim();
 
       document.getElementById('target-name').innerText = getVal('input-name').trim() || 'NAME';
@@ -609,8 +605,7 @@
 
       const targetSubclassNode = document.getElementById('target-subclass');
       if (mainClass) {
-        const parts = mainClass.split(/\/\/|•/);
-        targetSubclassNode.innerHTML = parts.map(p => p.trim()).join('<br>');
+        targetSubclassNode.innerText = mainClass;
       } else {
         targetSubclassNode.innerText = '[CLASS]';
       }
@@ -671,34 +666,22 @@
       }
     }
 
-    /* 화면 스케일의 영향을 받지 않는 독립 캡처 로직 */
     function downloadImage() {
-      const card = document.getElementById('card-container');
+      const node = document.getElementById('card-container');
+      const wrapper = document.getElementById('card-wrapper');
       
-      // 캡처용 독립 컨테이너 생성
-      const offscreenContainer = document.createElement('div');
-      offscreenContainer.style.position = 'fixed';
-      offscreenContainer.style.left = '-9999px';
-      offscreenContainer.style.top = '-9999px';
-      offscreenContainer.style.width = '580px';
-      offscreenContainer.style.zIndex = '-9999';
-
-      // 노드 복제
-      const clone = card.cloneNode(true);
-      clone.style.transform = 'none';
-      clone.style.width = '580px';
-      
-      offscreenContainer.appendChild(clone);
-      document.body.appendChild(offscreenContainer);
+      // 캡처 전 580px 고정 규격 상태로 복원
+      node.style.transform = 'none';
+      node.style.width = '580px';
+      wrapper.style.height = 'auto';
 
       const emptyPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
-      htmlToImage.toPng(clone, {
-        width: 580,
-        height: clone.offsetHeight,
+      htmlToImage.toPng(node, {
         pixelRatio: 2,
         cacheBust: true,
         skipFonts: true,
+        width: 580,
         imagePlaceholder: emptyPixel,
         filter: (element) => {
           if (element.tagName === 'IMG' && (!element.src || element.src === window.location.href)) {
@@ -708,7 +691,7 @@
         }
       })
       .then(function (dataUrl) {
-        document.body.removeChild(offscreenContainer);
+        adjustScale();
 
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         const name = document.getElementById('input-name').value.trim() || 'card';
@@ -726,9 +709,7 @@
         }
       })
       .catch(function (error) {
-        if (document.body.contains(offscreenContainer)) {
-          document.body.removeChild(offscreenContainer);
-        }
+        adjustScale();
         console.error('이미지 저장 실패:', error);
         alert('이미지 생성에 실패했습니다.');
       });
@@ -743,10 +724,10 @@
       const rawHTML = cardNode.outerHTML;
       
       navigator.clipboard.writeText(rawHTML).then(() => {
-        showToast("HTML 코드가 클립보드에 복사되었습니다!");
+        showToast("이동하 복사 완료");
       }).catch(err => {
         console.error('복사 실패:', err);
-        alert('복사에 실패했습니다.');
+        alert('삐빅상태불량.');
       });
     }
 
@@ -763,6 +744,8 @@
       const wrapper = document.getElementById('card-wrapper');
       const card = document.getElementById('card-container');
       const containerWidth = wrapper.offsetWidth;
+      
+      card.style.width = '580px';
       
       if (containerWidth < 580) {
         const scale = containerWidth / 580;
