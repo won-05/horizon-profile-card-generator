@@ -162,6 +162,17 @@
     .save-btn { background: #3b82f6; color: white; }
     .copy-btn { background: #10b981; color: white; }
 
+    /* 모달 닫기 전용 강조 버튼 스타일 */
+    .close-btn { 
+      background: #ef4444; 
+      color: white; 
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .close-btn:hover {
+      background: #dc2626;
+    }
+
     .toast {
       position: fixed;
       bottom: 20px;
@@ -192,14 +203,30 @@
       padding: 20px;
     }
     .modal-content {
+      position: relative;
       background: #131722;
-      padding: 20px;
+      padding: 25px 20px 20px 20px;
       border-radius: 12px;
       max-width: 90%;
       max-height: 90%;
       text-align: center;
       overflow-y: auto;
       border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    /* 모달 우측 상단 ✕ 버튼 */
+    .modal-close-icon {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      color: #8a96a8;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .modal-close-icon:hover {
+      color: #fff;
     }
     .modal-content img {
       max-width: 100%;
@@ -211,6 +238,7 @@
       font-size: 13px;
       color: #aaa;
       margin-bottom: 15px;
+      margin-top: 10px;
     }
 
     /* 미리보기 영역 */
@@ -424,10 +452,11 @@
   <!-- 모바일용 이미지 저장 모달 -->
   <div id="image-modal" class="modal-overlay">
     <div class="modal-content">
+      <span class="modal-close-icon" onclick="closeModal()">✕</span>
       <p>이미지를 <b>길게 눌러서 저장</b>하세요.</p>
       <img id="modal-img" src="" alt="생성된 카드">
       <div>
-        <button class="action-btn copy-btn" onclick="closeModal()">닫기</button>
+        <button class="action-btn close-btn" onclick="closeModal()">✕ 창 닫고 수정하러 가기</button>
       </div>
     </div>
   </div>
