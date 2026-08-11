@@ -202,26 +202,17 @@
       border: 1px solid rgba(255,255,255,0.2);
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
-    .modal-close-icon {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 20px;
-      color: #8a96a8;
-      cursor: pointer;
-      line-height: 1;
-    }
     .modal-content img {
       max-width: 100%;
       height: auto;
       border-radius: 8px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
     .modal-content p {
       font-size: 13px;
       color: #aaa;
       margin-bottom: 15px;
-      margin-top: 10px;
+      margin-top: 5px;
     }
 
     /* 미리보기 영역 */
@@ -427,10 +418,9 @@
 
   <div id="toast" class="toast">HTML 코드가 클립보드에 복사되었습니다!</div>
 
-  <!-- 모바일용 이미지 저장 모달 -->
+  <!-- 모바일용 이미지 저장 모달 (상단 X 아이콘 제거) -->
   <div id="image-modal" class="modal-overlay">
     <div class="modal-content">
-      <span class="modal-close-icon" onclick="closeModal()">✕</span>
       <p>이미지를 <b>길게 눌러서 저장</b>하세요.</p>
       <img id="modal-img" src="" alt="생성된 카드">
       <div>
@@ -513,7 +503,7 @@
             <span id="target-management" class="c-val-sub" style="display:block;white-space:pre-line;">[관리 기록 및 운용 로그를 입력하세요]</span>
           </div>
 
-          <!-- STORY LOG (텍스트 겹침 보완) -->
+          <!-- STORY LOG -->
           <div class="c-box-bg" style="padding:20px;border-radius:10px;margin-bottom:20px;">
             <div class="c-border" style="border-bottom-width:1px;border-bottom-style:solid;padding-bottom:10px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-end;">
               <div style="display:flex;flex-direction:column;gap:4px;">
@@ -667,17 +657,27 @@
     }
 
     function downloadImage() {
-      const node = document.getElementById('card-container');
-      const wrapper = document.getElementById('card-wrapper');
+      const sourceNode = document.getElementById('card-container');
       
-      // 캡처 전 580px 고정 규격 상태로 복원
-      node.style.transform = 'none';
-      node.style.width = '580px';
-      wrapper.style.height = 'auto';
+      // 화면 왜곡 영향 방지를 위해 원본 노드를 독립 복사본으로 생성
+      const clone = sourceNode.cloneNode(true);
+      
+      // 캡처 전용 임시 독립 컨테이너 설정
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '-9999px';
+      container.style.width = '580px';
+      
+      clone.style.transform = 'none';
+      clone.style.width = '580px';
+      
+      container.appendChild(clone);
+      document.body.appendChild(container);
 
       const emptyPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
-      htmlToImage.toPng(node, {
+      htmlToImage.toPng(clone, {
         pixelRatio: 2,
         cacheBust: true,
         skipFonts: true,
@@ -691,7 +691,7 @@
         }
       })
       .then(function (dataUrl) {
-        adjustScale();
+        document.body.removeChild(container);
 
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         const name = document.getElementById('input-name').value.trim() || 'card';
@@ -709,7 +709,9 @@
         }
       })
       .catch(function (error) {
-        adjustScale();
+        if (document.body.contains(container)) {
+          document.body.removeChild(container);
+        }
         console.error('이미지 저장 실패:', error);
         alert('이미지 생성에 실패했습니다.');
       });
@@ -727,7 +729,7 @@
         showToast("이동하 복사 완료");
       }).catch(err => {
         console.error('복사 실패:', err);
-        alert('삐빅상태불량.');
+        alert('삐빅상태불량');
       });
     }
 
