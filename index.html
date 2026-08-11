@@ -180,6 +180,39 @@
     }
     .toast.show { opacity: 1; transform: translateY(0); }
 
+    /* 모바일 이미지 저장 팝업 레이어 */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    .modal-content {
+      background: #131722;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 90%;
+      max-height: 90%;
+      text-align: center;
+      overflow-y: auto;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .modal-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .modal-content p {
+      font-size: 13px;
+      color: #aaa;
+      margin-bottom: 15px;
+    }
+
     /* 미리보기 영역 */
     .preview-pane {
       flex: 2 1 580px;
@@ -309,7 +342,6 @@
       <input type="file" accept="image/*" onchange="uploadImage(event, 'target-profile', 'input-profile-url')">
     </div>
 
-    <!-- 이미지 양식과 맞춰 4개 필드로 개별화 -->
     <div class="form-group">
       <label>성별 / 키</label>
       <div class="form-row">
@@ -328,7 +360,7 @@
 
     <div class="form-group">
       <label>외모 설명(VISUAL)</label>
-      <textarea id="input-visual" placeholder="서영현이라서 서방님" oninput="updateText()"></textarea>
+      <textarea id="input-visual" placeholder="외모 상세 정보" oninput="updateText()"></textarea>
     </div>
 
     <div class="form-group">
@@ -380,14 +412,25 @@
       <label>추가 데이터 02(DATA.02)</label>
       <textarea id="input-data2" placeholder="취미, 특이사항 등" oninput="updateText()"></textarea>
     </div>
-    
+
     <div class="btn-group">
-      <button class="action-btn save-btn" onclick="downloadImage()">PNG 이미지로 저장하기</button>
-      <button class="action-btn copy-btn" onclick="copyHTML()">HTML 코드 복사하기</button>
+      <button class="action-btn save-btn" onclick="downloadImage()">이미지로 저장하기</button>
+      <button class="action-btn copy-btn" onclick="copyHTML()">HTML 코드 복사하기(이미지 URL로 변경 후 복사하세요!)</button>
     </div>
   </div>
 
   <div id="toast" class="toast">HTML 코드가 클립보드에 복사되었습니다!</div>
+
+  <!-- 모바일용 이미지 저장 모달 -->
+  <div id="image-modal" class="modal-overlay">
+    <div class="modal-content">
+      <p>이미지를 <b>길게 눌러서 저장</b>하세요.</p>
+      <img id="modal-img" src="" alt="생성된 카드">
+      <div>
+        <button class="action-btn copy-btn" onclick="closeModal()">닫기</button>
+      </div>
+    </div>
+  </div>
 
   <!-- 카드 미리보기 영역 -->
   <div class="preview-pane">
@@ -411,7 +454,7 @@
               <span class="c-val" style="font-weight:bold;">■ ■ ■</span> SYSTEM MONITOR // 
             </div>
             <div class="c-border c-img-bg" style="border-width:1px;border-style:solid;border-radius:6px;overflow:hidden;min-height:150px;display:flex;align-items:center;justify-content:center;">
-              <img id="target-banner" src="" style="width:100%;height:auto;display:none;max-height:230px;object-fit:cover;">
+              <img id="target-banner" style="width:100%;height:auto;display:none;max-height:230px;object-fit:cover;">
               <div id="banner-placeholder" class="img-placeholder c-label">배너 이미지를 등록하세요</div>
             </div>
             <div class="c-label" style="font-size:9px;letter-spacing:1px;margin-top:8px;overflow:hidden;">
@@ -424,7 +467,7 @@
           <div style="display:flex;flex-wrap:wrap;gap:15px;margin-bottom:20px;">
             <div class="c-box-bg" style="flex:1 1 130px;max-width:100%;padding:12px;border-radius:10px;text-align:center;">
               <div style="width:105px;height:140px;margin:0 auto 8px auto;position:relative;">
-                <img id="target-profile" src="" style="width:100%;height:100%;border-radius:6px;object-fit:cover;display:none;">
+                <img id="target-profile" style="width:100%;height:100%;border-radius:6px;object-fit:cover;display:none;">
                 <div id="profile-placeholder" class="img-placeholder c-label" style="height:100%;">프로필 이미지</div>
               </div>
               <div id="target-subname" class="c-val" style="font-size:14px;font-weight:bold;letter-spacing:1px;margin-bottom:4px;">NAME</div>
@@ -433,19 +476,19 @@
 
             <div class="c-box-soft" style="flex:2 1 300px;padding:15px;border-radius:10px;font-size:13px;line-height:1.6;display:flex;flex-direction:column;justify-content:center;">
               <div class="c-border" style="padding-bottom:6px;border-bottom-width:1px;border-bottom-style:solid;">
-                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">GENDER</b><span id="target-gender" class="c-val" style="font-weight:bold;">FEMALE</span>
+                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">GENDER</b><span id="target-gender" class="c-val"></span>
               </div>
               <div class="c-border" style="padding:6px 0;border-bottom-width:1px;border-bottom-style:solid;">
-                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">AGE</b><span id="target-age" class="c-val" style="font-weight:bold;">24</span>
+                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">AGE</b><span id="target-age" class="c-val"></span>
               </div>
               <div class="c-border" style="padding:6px 0;border-bottom-width:1px;border-bottom-style:solid;">
-                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">NATION</b><span id="target-nation" class="c-val" style="font-weight:bold;">REPUBLIC OF KOREA</span>
+                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">NATION</b><span id="target-nation" class="c-val"></span>
               </div>
               <div class="c-border" style="padding:6px 0;border-bottom-width:1px;border-bottom-style:solid;">
-                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">HEIGHT</b><span id="target-height" class="c-val" style="font-weight:bold;">167</span>
+                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">HEIGHT</b><span id="target-height" class="c-val"></span>
               </div>
               <div style="padding-top:6px;">
-                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;vertical-align:top;">VISUAL</b><span id="target-visual" class="c-val-sub" style="display:inline-block;width:calc(100% - 80px);vertical-align:top;word-break:keep-all;">밝은 캐러멜 주황색의 머리 / 밝은 회색눈 / 뾰족한 송곳니 / 가느다랗고 길쭉한 체형</span>
+                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;vertical-align:top;">VISUAL</b><span id="target-visual" class="c-val-sub" style="display:inline-block;width:calc(100% - 80px);vertical-align:top;word-break:keep-all;"></span>
               </div>
             </div>
           </div>
@@ -504,7 +547,6 @@
   </div>
 
   <script>
-    // 태그 자동 삽입 함수
     function insertTag(fieldId, openTag, closeTag) {
       const field = document.getElementById(fieldId);
       const start = field.selectionStart;
@@ -521,7 +563,6 @@
       updateText();
     }
 
-    // 컬러피커 색상 적용 함수
     function applyColor(fieldId, colorPickerId) {
       const colorHex = document.getElementById(colorPickerId).value;
       const openTag = `<span style="color:${colorHex}">`;
@@ -587,10 +628,12 @@
       const placeholderNode = document.getElementById(placeholderId);
 
       if (url.trim()) {
+        imgNode.removeAttribute('src'); // 기존 속성 제거 후 설정
         imgNode.src = url;
         imgNode.style.display = 'block';
         if (placeholderNode) placeholderNode.style.display = 'none';
       } else {
+        imgNode.removeAttribute('src');
         imgNode.style.display = 'none';
         if (placeholderNode) placeholderNode.style.display = 'flex';
       }
@@ -616,20 +659,56 @@
       }
     }
 
+    // 예외 처리가 강화된 이미지 다운로드 함수
     function downloadImage() {
       const node = document.getElementById('card-container');
-      htmlToImage.toPng(node, { pixelRatio: 2, cacheBust: true })
-        .then(function (dataUrl) {
+      
+      const currentTransform = node.style.transform;
+      node.style.transform = 'none';
+
+      // 투명 1px 이미지 데이터 (src가 없거나 캡처 에러 방지용)
+      const emptyPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+      htmlToImage.toPng(node, {
+        pixelRatio: 2,
+        cacheBust: true,
+        skipFonts: true, // 외부 폰트 렌더링 에러 차단
+        imagePlaceholder: emptyPixel, // 이미지 로드 실패 시 대체 이미지 설정
+        filter: (element) => {
+          // src 속성이 없는 <img> 태그는 캡처 연산에서 오작동을 방지하기 위해 필터링
+          if (element.tagName === 'IMG' && (!element.src || element.src === window.location.href)) {
+            return false;
+          }
+          return true;
+        }
+      })
+      .then(function (dataUrl) {
+        node.style.transform = currentTransform;
+
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const name = document.getElementById('input-name').value.trim() || 'card';
+
+        if (isMobile) {
+          document.getElementById('modal-img').src = dataUrl;
+          document.getElementById('image-modal').style.display = 'flex';
+        } else {
           const link = document.createElement('a');
-          const name = document.getElementById('input-name').value || 'card';
           link.download = `${name}_card.png`;
           link.href = dataUrl;
+          document.body.appendChild(link);
           link.click();
-        })
-        .catch(function (error) {
-          console.error('이미지 저장 실패:', error);
-          alert('삐빅상태불량');
-        });
+          document.body.removeChild(link);
+        }
+      })
+      .catch(function (error) {
+        node.style.transform = currentTransform;
+        console.error('이미지 저장 실패:', error);
+        alert('이미지 생성에 실패했습니다. (로컬 파일 대신 URL 이미지를 사용하거나 문자를 변경해 보세요)');
+      });
+    }
+
+    function closeModal() {
+      document.getElementById('image-modal').style.display = 'none';
     }
 
     function copyHTML() {
