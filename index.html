@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>듀라이즌 프로필 카드 생성기</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      background-color: #05070a;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      text-transform: uppercase;
+    }
+
+    /* 에디터 패널 */
+    .editor-pane {
+      flex: 1 1 360px;
+      max-width: 440px;
+      background: #131722;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      position: sticky;
+      top: 20px;
+    }
+    .editor-pane h2 {
+      font-size: 18px;
+      margin-top: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 10px;
+      color: #fff;
+    }
+    .form-group { margin-bottom: 15px; }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: #8a96a8;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .form-group input[type="text"], 
+    .form-group textarea,
+    .form-group input[type="file"] {
+      width: 100%;
+      padding: 8px 12px;
+      background: #0d1017;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 13px;
+    }
+    .form-group textarea { height: 85px; resize: vertical; }
+
+    .form-row {
+      display: flex;
+      gap: 10px;
+    }
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    /* 텍스트 포맷팅 서식 툴바 */
+    .fmt-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .fmt-btn {
+      background: #1e2638;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #ccc;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.15s;
+    }
+    .fmt-btn:hover {
+      background: #3b82f6;
+      color: #fff;
+    }
+    .color-picker-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: #0d1017;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .color-picker-wrapper input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+      cursor: pointer;
+      background: none;
+      padding: 0;
+    }
+    .color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    .color-picker-wrapper input[type="color"]::-webkit-color-swatch {
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 3px;
+    }
+
+    .theme-toggle-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+      background: #0d1017;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .theme-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: #8a96a8;
+      font-weight: bold;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .theme-btn.active {
+      background: #3b82f6;
+      color: #fff;
+    }
+    
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .action-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .save-btn { background: #3b82f6; color: white; }
+    .copy-btn { background: #10b981; color: white; }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #10b981;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* 미리보기 영역 */
+    .preview-pane {
+      flex: 2 1 580px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+      width: 100%;
+    }
+
+    #card-wrapper {
+      width: 580px;
+      max-width: 100%;
+    }
+
+    #card-container {
+      width: 580px;
+      transition: all 0.3s ease;
+      transform-origin: top left;
+    }
+
+    .img-placeholder {
+      width: 100%;
+      height: 100%;
+      min-height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      border: 1px dashed rgba(150, 150, 150, 0.3);
+      border-radius: 6px;
+    }
+
+    /* 센티넬 테마 */
+    .theme-sentinel {
+      background: #0d1017;
+      color: #b0b9cc;
+    }
+    .theme-sentinel .c-accent-bar { background: #555; }
+    .theme-sentinel .c-border { border-color: rgba(255,255,255,0.08); }
+    .theme-sentinel .c-title { color: #ffffff; }
+    .theme-sentinel .c-subtitle { color: #8a96a8; border-color: #555; }
+    .theme-sentinel .c-box-bg { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); }
+    .theme-sentinel .c-box-soft { background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.05); }
+    .theme-sentinel .c-label { color: #888; }
+    .theme-sentinel .c-val { color: #ffffff; }
+    .theme-sentinel .c-val-sub { color: #a2aebd; }
+    .theme-sentinel .c-tag { background: rgba(255,255,255,0.08); color: #bbb; }
+    .theme-sentinel .c-img-bg { background: #000; }
+    .theme-sentinel .c-highlight-box { background: rgba(255,255,255,0.05); border-left: 3px solid #666; color: #fff; }
+
+    /* 가이드 테마 */
+    .theme-guide {
+      background: #f9f9f9;
+      color: #333;
+    }
+    .theme-guide .c-accent-bar { background: #ddd; }
+    .theme-guide .c-border { border-color: rgba(0,0,0,0.1); }
+    .theme-guide .c-title { color: #000000; }
+    .theme-guide .c-subtitle { color: #555; border-color: #ccc; }
+    .theme-guide .c-box-bg { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.1); }
+    .theme-guide .c-box-soft { background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.08); }
+    .theme-guide .c-label { color: #777; }
+    .theme-guide .c-val { color: #000000; }
+    .theme-guide .c-val-sub { color: #444; }
+    .theme-guide .c-tag { background: rgba(0,0,0,0.08); color: #555; }
+    .theme-guide .c-img-bg { background: #eee; }
+    .theme-guide .c-highlight-box { background: rgba(0,0,0,0.05); border-left: 3px solid #999; color: #000; }
+
+    @media (max-width: 900px) {
+      body { padding: 10px; gap: 15px; }
+      .editor-pane {
+        max-width: 100%;
+        flex: 1 1 100%;
+        max-height: none;
+        position: static;
+      }
+      .preview-pane {
+        flex: 1 1 100%;
+        padding: 0;
+        overflow-x: hidden;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="editor-pane">
+    <h2>카드 데이터 입력</h2>
+
+    <div class="form-group">
+      <label>테마 스타일 선택</label>
+      <div class="theme-toggle-group">
+        <button class="theme-btn active" id="btn-sentinel" onclick="setTheme('sentinel')">센티넬</button>
+        <button class="theme-btn" id="btn-guide" onclick="setTheme('guide')">가이드</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>코드네임 / 이름</label>
+      <input type="text" id="input-name" placeholder="예: ZERO" oninput="updateText()">
+    </div>
+
+    <div class="form-group">
+      <label>상단 서브타이틀(클래스 // 소속)</label>
+      <input type="text" id="input-class" placeholder="예: S CLASS SENTINEL // APEX 2ND UNIT" oninput="updateText()">
+    </div>
+
+    <div class="form-group">
+      <label>슬로건</label>
+      <input type="text" id="input-slogan" placeholder="예: 침묵을 걷는 그림자" oninput="updateText()">
+    </div>
+
+    <div class="form-group">
+      <label>상단 배너 이미지(URL 또는 파일)</label>
+      <input type="text" id="input-banner-url" oninput="updateImageFromUrl('input-banner-url', 'target-banner')" placeholder="URL 입력" style="margin-bottom:6px;">
+      <input type="file" accept="image/*" onchange="uploadImage(event, 'target-banner', 'input-banner-url')">
+    </div>
+
+    <div class="form-group">
+      <label>배너 하단 왼쪽 라벨 (시스템용)</label>
+      <input type="text" id="input-sys-left" placeholder="기본값: ▲ SYS_00" oninput="updateText()">
+    </div>
+
+    <div class="form-group">
+      <label>프로필 이미지(URL 또는 파일)</label>
+      <input type="text" id="input-profile-url" oninput="updateImageFromUrl('input-profile-url', 'target-profile')" placeholder="URL 입력" style="margin-bottom:6px;">
+      <input type="file" accept="image/*" onchange="uploadImage(event, 'target-profile', 'input-profile-url')">
+    </div>
+
+    <!-- 이미지 양식과 맞춰 4개 필드로 개별화 -->
+    <div class="form-group">
+      <label>성별 / 키</label>
+      <div class="form-row">
+        <input type="text" id="input-gender" placeholder="male/female" oninput="updateText()">
+        <input type="text" id="input-height" placeholder="180cm" oninput="updateText()">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>나이 / 국적</label>
+      <div class="form-row">
+        <input type="text" id="input-age" placeholder="27" oninput="updateText()">
+        <input type="text" id="input-nation" placeholder="REPUBLIC OF KOREA" oninput="updateText()">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>외모 설명(VISUAL)</label>
+      <textarea id="input-visual" placeholder="서영현이라서 서방님" oninput="updateText()"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>능력 프로필(ABILITY PROFILE)</label>
+      <div class="fmt-toolbar">
+        <button class="fmt-btn" onclick="insertTag('input-ability', '<b>', '</b>')"><b>굵게</b></button>
+      </div>
+      <textarea id="input-ability" placeholder="특수 능력 및 세부 프로필" oninput="updateText()"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>관리 로그(MANAGEMENT LOG)</label>
+      <textarea id="input-management" placeholder="부대 소속, 특이 관리 사항" oninput="updateText()"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>문서 타입(FILE: [이곳 입력])</label>
+      <input type="text" id="input-file-doc" placeholder="기본값: DOC" oninput="updateText()">
+    </div>
+
+    <div class="form-group">
+      <label>스토리 강조 문구(STORY LOG HIGHLIGHT)</label>
+      <div class="fmt-toolbar">
+        <div class="color-picker-wrapper">
+          <input type="color" id="color-story-highlight" value="#ff4d4d">
+          <button class="fmt-btn" onclick="applyColor('input-story-highlight', 'color-story-highlight')">글자색 적용</button>
+        </div>
+      </div>
+      <textarea id="input-story-highlight" placeholder="상단 강조 문구를 입력하세요." oninput="updateText()"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>스토리 본문(STORY LOG MAIN)</label>
+      <div class="fmt-toolbar">
+        <div class="color-picker-wrapper">
+          <input type="color" id="color-story" value="#ff4d4d">
+          <button class="fmt-btn" onclick="applyColor('input-story', 'color-story')">글자색 적용</button>
+        </div>
+      </div>
+      <textarea id="input-story" placeholder="캐릭터의 세부 서사/배경 이야기" style="height:120px;" oninput="updateText()"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>추가 데이터 01(DATA.01)</label>
+      <textarea id="input-data1" placeholder="운용 기록, 사격, 가족관계 등" oninput="updateText()"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>추가 데이터 02(DATA.02)</label>
+      <textarea id="input-data2" placeholder="취미, 특이사항 등" oninput="updateText()"></textarea>
+    </div>
+    
+    <div class="btn-group">
+      <button class="action-btn save-btn" onclick="downloadImage()">PNG 이미지로 저장하기</button>
+      <button class="action-btn copy-btn" onclick="copyHTML()">HTML 코드 복사하기</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">HTML 코드가 클립보드에 복사되었습니다!</div>
+
+  <!-- 카드 미리보기 영역 -->
+  <div class="preview-pane">
+    <div id="card-wrapper">
+      <div id="card-container" class="theme-sentinel">
+        <div class="c-accent-bar" style="height:3px;margin:0;"></div>
+        <div style="padding:25px 15px 15px 15px;letter-spacing:-0.4px;font-family:sans-serif;">
+          
+          <!-- 헤더 -->
+          <div class="c-border" style="border-bottom-width:1px;border-bottom-style:solid;padding-bottom:12px;margin-bottom:20px;">
+            <div id="target-class" class="c-label" style="font-size:10px;letter-spacing:2px;font-weight:bold;margin-bottom:4px;">[CLASS // UNIT]</div>
+            <div id="target-name" class="c-title" style="font-size:30px;font-weight:900;letter-spacing:2px;margin-bottom:6px;">NAME</div>
+            <div class="c-subtitle" style="font-size:14px;border-left-width:2px;border-left-style:solid;padding-left:10px;margin-top:5px;">
+              <b id="target-slogan">[슬로건 문구를 입력하세요]</b>
+            </div>
+          </div>
+
+          <!-- 배너 영역 -->
+          <div class="c-box-bg" style="border-radius:12px;padding:12px;margin-bottom:25px;">
+            <div class="c-label" style="font-size:9px;letter-spacing:1px;margin-bottom:8px;overflow:hidden;">
+              <span class="c-val" style="font-weight:bold;">■ ■ ■</span> SYSTEM MONITOR // 
+            </div>
+            <div class="c-border c-img-bg" style="border-width:1px;border-style:solid;border-radius:6px;overflow:hidden;min-height:150px;display:flex;align-items:center;justify-content:center;">
+              <img id="target-banner" src="" style="width:100%;height:auto;display:none;max-height:230px;object-fit:cover;">
+              <div id="banner-placeholder" class="img-placeholder c-label">배너 이미지를 등록하세요</div>
+            </div>
+            <div class="c-label" style="font-size:9px;letter-spacing:1px;margin-top:8px;overflow:hidden;">
+              <span id="target-sys-left" style="float:left;">▲ SYS_00</span><span style="float:right;">▼ SYS.LNK</span>
+              <div style="text-align:center;font-size:8px;">ANALYZING AETHER...</div>
+            </div>
+          </div>
+
+          <!-- 프로필 & 기본 정보 -->
+          <div style="display:flex;flex-wrap:wrap;gap:15px;margin-bottom:20px;">
+            <div class="c-box-bg" style="flex:1 1 130px;max-width:100%;padding:12px;border-radius:10px;text-align:center;">
+              <div style="width:105px;height:140px;margin:0 auto 8px auto;position:relative;">
+                <img id="target-profile" src="" style="width:100%;height:100%;border-radius:6px;object-fit:cover;display:none;">
+                <div id="profile-placeholder" class="img-placeholder c-label" style="height:100%;">프로필 이미지</div>
+              </div>
+              <div id="target-subname" class="c-val" style="font-size:14px;font-weight:bold;letter-spacing:1px;margin-bottom:4px;">NAME</div>
+              <span id="target-subclass" class="c-tag" style="font-size:9px;font-weight:bold;padding:4px 8px;border-radius:4px;display:inline-block;line-height:1.3;word-break:break-word;">[CLASS]</span>
+            </div>
+
+            <div class="c-box-soft" style="flex:2 1 300px;padding:15px;border-radius:10px;font-size:13px;line-height:1.6;display:flex;flex-direction:column;justify-content:center;">
+              <div class="c-border" style="padding-bottom:6px;border-bottom-width:1px;border-bottom-style:solid;">
+                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">GENDER</b><span id="target-gender" class="c-val" style="font-weight:bold;">FEMALE</span>
+              </div>
+              <div class="c-border" style="padding:6px 0;border-bottom-width:1px;border-bottom-style:solid;">
+                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">AGE</b><span id="target-age" class="c-val" style="font-weight:bold;">24</span>
+              </div>
+              <div class="c-border" style="padding:6px 0;border-bottom-width:1px;border-bottom-style:solid;">
+                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">NATION</b><span id="target-nation" class="c-val" style="font-weight:bold;">REPUBLIC OF KOREA</span>
+              </div>
+              <div class="c-border" style="padding:6px 0;border-bottom-width:1px;border-bottom-style:solid;">
+                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;">HEIGHT</b><span id="target-height" class="c-val" style="font-weight:bold;">167</span>
+              </div>
+              <div style="padding-top:6px;">
+                <b class="c-label" style="font-size:11px;display:inline-block;width:75px;vertical-align:top;">VISUAL</b><span id="target-visual" class="c-val-sub" style="display:inline-block;width:calc(100% - 80px);vertical-align:top;word-break:keep-all;">밝은 캐러멜 주황색의 머리 / 밝은 회색눈 / 뾰족한 송곳니 / 가느다랗고 길쭉한 체형</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ABILITY PROFILE -->
+          <div class="c-box-bg" style="padding:15px;border-radius:10px;font-size:12.5px;line-height:1.65;margin-bottom:15px;">
+            <b class="c-title" style="font-size:13px;display:block;margin-bottom:6px;">ABILITY PROFILE</b>
+            <span id="target-ability" class="c-val-sub" style="display:block;white-space:pre-line;">[능력 프로필을 입력하세요]</span>
+          </div>
+
+          <!-- MANAGEMENT LOG -->
+          <div class="c-box-bg" style="padding:15px;border-radius:10px;font-size:12.5px;line-height:1.65;margin-bottom:20px;">
+            <b class="c-title" style="font-size:13px;display:block;margin-bottom:6px;">MANAGEMENT LOG</b>
+            <span id="target-management" class="c-val-sub" style="display:block;white-space:pre-line;">[관리 기록 및 운용 로그를 입력하세요]</span>
+          </div>
+
+          <!-- STORY LOG -->
+          <div class="c-box-bg" style="padding:20px;border-radius:10px;margin-bottom:20px;">
+            <div class="c-border" style="border-bottom-width:1px;border-bottom-style:solid;padding-bottom:10px;margin-bottom:14px;overflow:hidden;">
+              <div style="float:left;">
+                <span class="c-label" style="font-size:9px;letter-spacing:1px;display:block;margin-bottom:2px;">DOCUMENT DOSSIER</span>
+                <b class="c-title" style="font-size:18px;">STORY LOG</b>
+              </div>
+              <div class="c-label" style="float:right;font-size:10px;margin-top:10px;">
+                FILE: <span id="target-file-doc">DOC</span> // <span class="c-val" style="font-weight:bold;">RESTRICTED</span>
+              </div>
+            </div>
+            <div style="font-size:13.5px;line-height:1.8;text-align:justify;word-break:keep-all;">
+              <div id="target-story-highlight" class="c-highlight-box" style="padding:10px 14px;margin-bottom:12px;font-weight:bold;white-space:pre-line;">
+                [스토리 강조 요약 문구를 입력하세요]
+              </div>
+              <div id="target-story" class="c-val-sub" style="white-space:pre-line;">
+                [스토리 본문 내용을 입력하세요]
+              </div>
+            </div>
+          </div>
+
+          <!-- DATA.01 & DATA.02 -->
+          <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:25px;">
+            <div class="c-box-bg" style="flex:1 1 250px;padding:14px;border-radius:8px;">
+              <b class="c-label" style="font-size:11px;display:block;margin-bottom:6px;letter-spacing:0.5px;">// DATA.01</b>
+              <div id="target-data1" class="c-val-sub" style="font-size:12px;line-height:1.6;white-space:pre-line;">[추가 세부 데이터 01]</div>
+            </div>
+            <div class="c-box-bg" style="flex:1 1 250px;padding:14px;border-radius:8px;">
+              <b class="c-label" style="font-size:11px;display:block;margin-bottom:6px;letter-spacing:0.5px;">// DATA.02</b>
+              <div id="target-data2" class="c-val-sub" style="font-size:12px;line-height:1.6;white-space:pre-line;">[추가 세부 데이터 02]</div>
+            </div>
+          </div>
+
+          <div class="c-border c-label" style="text-align:center;padding-top:12px;border-top-width:1px;border-top-style:solid;font-size:9px;letter-spacing:2px;">
+            RECORD END // TRANSMISSION CLOSED
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 태그 자동 삽입 함수
+    function insertTag(fieldId, openTag, closeTag) {
+      const field = document.getElementById(fieldId);
+      const start = field.selectionStart;
+      const end = field.selectionEnd;
+      const text = field.value;
+      const selectedText = text.substring(start, end);
+      
+      const replacement = openTag + selectedText + closeTag;
+      field.value = text.substring(0, start) + replacement + text.substring(end);
+      
+      field.focus();
+      field.setSelectionRange(start + openTag.length, start + openTag.length + selectedText.length);
+      
+      updateText();
+    }
+
+    // 컬러피커 색상 적용 함수
+    function applyColor(fieldId, colorPickerId) {
+      const colorHex = document.getElementById(colorPickerId).value;
+      const openTag = `<span style="color:${colorHex}">`;
+      const closeTag = `</span>`;
+      insertTag(fieldId, openTag, closeTag);
+    }
+
+    function setTheme(type) {
+      const card = document.getElementById('card-container');
+      const btnSentinel = document.getElementById('btn-sentinel');
+      const btnGuide = document.getElementById('btn-guide');
+
+      if (type === 'guide') {
+        card.className = 'theme-guide';
+        btnGuide.classList.add('active');
+        btnSentinel.classList.remove('active');
+      } else {
+        card.className = 'theme-sentinel';
+        btnSentinel.classList.add('active');
+        btnGuide.classList.remove('active');
+      }
+    }
+
+    function updateText() {
+      const getVal = id => document.getElementById(id).value;
+      
+      const mainClass = getVal('input-class').trim();
+
+      document.getElementById('target-name').innerText = getVal('input-name').trim() || 'NAME';
+      document.getElementById('target-subname').innerText = getVal('input-name').trim() || 'NAME';
+      document.getElementById('target-class').innerText = mainClass || '[CLASS // UNIT]';
+
+      const targetSubclassNode = document.getElementById('target-subclass');
+      if (mainClass) {
+        const parts = mainClass.split(/\/\/|•/);
+        targetSubclassNode.innerHTML = parts.map(p => p.trim()).join('<br>');
+      } else {
+        targetSubclassNode.innerText = '[CLASS]';
+      }
+
+      document.getElementById('target-slogan').innerText = getVal('input-slogan').trim() || '[슬로건 문구를 입력하세요]';
+      document.getElementById('target-sys-left').innerText = getVal('input-sys-left').trim() || '▲ SYS_00';
+      
+      document.getElementById('target-gender').innerText = getVal('input-gender').trim() || 'FEMALE';
+      document.getElementById('target-height').innerText = getVal('input-height').trim() || '167';
+      document.getElementById('target-age').innerText = getVal('input-age').trim() || '24';
+      document.getElementById('target-nation').innerText = getVal('input-nation').trim() || 'REPUBLIC OF KOREA';
+      
+      document.getElementById('target-visual').innerHTML = getVal('input-visual').trim() || '밝은 캐러멜 주황색의 머리 / 밝은 회색눈 / 뾰족한 송곳니 / 가느다랗고 길쭉한 체형';
+      document.getElementById('target-ability').innerHTML = getVal('input-ability').trim() || '[능력 프로필을 입력하세요]';
+      document.getElementById('target-management').innerHTML = getVal('input-management').trim() || '[관리 기록 및 운용 로그를 입력하세요]';
+      document.getElementById('target-file-doc').innerText = getVal('input-file-doc').trim() || 'DOC';
+      document.getElementById('target-story-highlight').innerHTML = getVal('input-story-highlight').trim() || '[스토리 강조 요약 문구를 입력하세요]';
+      document.getElementById('target-story').innerHTML = getVal('input-story').trim() || '[스토리 본문 내용을 입력하세요]';
+      document.getElementById('target-data1').innerHTML = getVal('input-data1').trim() || '[추가 세부 데이터 01]';
+      document.getElementById('target-data2').innerHTML = getVal('input-data2').trim() || '[추가 세부 데이터 02]';
+    }
+
+    function updateImageFromUrl(inputId, targetImgId) {
+      const url = document.getElementById(inputId).value;
+      const imgNode = document.getElementById(targetImgId);
+      const placeholderId = targetImgId === 'target-banner' ? 'banner-placeholder' : 'profile-placeholder';
+      const placeholderNode = document.getElementById(placeholderId);
+
+      if (url.trim()) {
+        imgNode.src = url;
+        imgNode.style.display = 'block';
+        if (placeholderNode) placeholderNode.style.display = 'none';
+      } else {
+        imgNode.style.display = 'none';
+        if (placeholderNode) placeholderNode.style.display = 'flex';
+      }
+    }
+
+    function uploadImage(event, targetImgId, inputUrlId) {
+      const file = event.target.files[0];
+      const imgNode = document.getElementById(targetImgId);
+      const placeholderId = targetImgId === 'target-banner' ? 'banner-placeholder' : 'profile-placeholder';
+      const placeholderNode = document.getElementById(placeholderId);
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          imgNode.src = e.target.result;
+          imgNode.style.display = 'block';
+          if (placeholderNode) placeholderNode.style.display = 'none';
+          if (inputUrlId) {
+            document.getElementById(inputUrlId).value = "(로컬 파일 사용 중)";
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function downloadImage() {
+      const node = document.getElementById('card-container');
+      htmlToImage.toPng(node, { pixelRatio: 2, cacheBust: true })
+        .then(function (dataUrl) {
+          const link = document.createElement('a');
+          const name = document.getElementById('input-name').value || 'card';
+          link.download = `${name}_card.png`;
+          link.href = dataUrl;
+          link.click();
+        })
+        .catch(function (error) {
+          console.error('이미지 저장 실패:', error);
+          alert('삐빅상태불량');
+        });
+    }
+
+    function copyHTML() {
+      const cardNode = document.getElementById('card-container');
+      const rawHTML = cardNode.outerHTML;
+      
+      navigator.clipboard.writeText(rawHTML).then(() => {
+        showToast("이동하복사완료");
+      }).catch(err => {
+        console.error('복사 실패:', err);
+        alert('삐빅상태불량');
+      });
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    function adjustScale() {
+      const wrapper = document.getElementById('card-wrapper');
+      const card = document.getElementById('card-container');
+      const containerWidth = wrapper.offsetWidth;
+      
+      if (containerWidth < 580) {
+        const scale = containerWidth / 580;
+        card.style.transform = `scale(${scale})`;
+        wrapper.style.height = `${card.offsetHeight * scale}px`;
+      } else {
+        card.style.transform = 'none';
+        wrapper.style.height = 'auto';
+      }
+    }
+
+    window.addEventListener('resize', adjustScale);
+    window.addEventListener('DOMContentLoaded', adjustScale);
+  </script>
+</body>
+</html>
