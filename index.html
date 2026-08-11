@@ -162,7 +162,6 @@
     .save-btn { background: #3b82f6; color: white; }
     .copy-btn { background: #10b981; color: white; }
 
-    /* 모달 닫기 전용 강조 버튼 스타일 */
     .close-btn { 
       background: #ef4444; 
       color: white; 
@@ -214,7 +213,6 @@
       border: 1px solid rgba(255,255,255,0.2);
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     }
-    /* 모달 우측 상단 ✕ 버튼 */
     .modal-close-icon {
       position: absolute;
       top: 10px;
@@ -258,7 +256,7 @@
 
     #card-container {
       width: 580px;
-      transition: all 0.3s ease;
+      transition: transform 0.2s ease;
       transform-origin: top left;
     }
 
@@ -443,7 +441,7 @@
 
     <div class="btn-group">
       <button class="action-btn save-btn" onclick="downloadImage()">이미지로 저장하기</button>
-      <button class="action-btn copy-btn" onclick="copyHTML()">HTML 코드 복사하기(이미지 URL로 변경 후 복사하세요!)</button>
+      <button class="action-btn copy-btn" onclick="copyHTML()">HTML 코드 복사하기</button>
     </div>
   </div>
 
@@ -534,14 +532,14 @@
             <span id="target-management" class="c-val-sub" style="display:block;white-space:pre-line;">[관리 기록 및 운용 로그를 입력하세요]</span>
           </div>
 
-          <!-- STORY LOG -->
+          <!-- STORY LOG (레이아웃 겹침 수정 완료) -->
           <div class="c-box-bg" style="padding:20px;border-radius:10px;margin-bottom:20px;">
-            <div class="c-border" style="border-bottom-width:1px;border-bottom-style:solid;padding-bottom:10px;margin-bottom:14px;overflow:hidden;">
-              <div style="float:left;">
-                <span class="c-label" style="font-size:9px;letter-spacing:1px;display:block;margin-bottom:2px;">DOCUMENT DOSSIER</span>
-                <b class="c-title" style="font-size:18px;">STORY LOG</b>
+            <div class="c-border" style="border-bottom-width:1px;border-bottom-style:solid;padding-bottom:10px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-end;">
+              <div>
+                <span class="c-label" style="font-size:9px;letter-spacing:1px;display:block;margin-bottom:4px;line-height:1;">DOCUMENT DOSSIER</span>
+                <b class="c-title" style="font-size:18px;line-height:1;display:block;">STORY LOG</b>
               </div>
-              <div class="c-label" style="float:right;font-size:10px;margin-top:10px;">
+              <div class="c-label" style="font-size:10px;line-height:1;">
                 FILE: <span id="target-file-doc">DOC</span> // <span class="c-val" style="font-weight:bold;">RESTRICTED</span>
               </div>
             </div>
@@ -635,12 +633,12 @@
       document.getElementById('target-slogan').innerText = getVal('input-slogan').trim() || '[슬로건 문구를 입력하세요]';
       document.getElementById('target-sys-left').innerText = getVal('input-sys-left').trim() || '▲ SYS_00';
       
-      document.getElementById('target-gender').innerText = getVal('input-gender').trim() || 'FEMALE';
-      document.getElementById('target-height').innerText = getVal('input-height').trim() || '167';
-      document.getElementById('target-age').innerText = getVal('input-age').trim() || '24';
-      document.getElementById('target-nation').innerText = getVal('input-nation').trim() || 'REPUBLIC OF KOREA';
+      document.getElementById('target-gender').innerText = getVal('input-gender').trim() || '';
+      document.getElementById('target-height').innerText = getVal('input-height').trim() || '';
+      document.getElementById('target-age').innerText = getVal('input-age').trim() || '';
+      document.getElementById('target-nation').innerText = getVal('input-nation').trim() || '';
       
-      document.getElementById('target-visual').innerHTML = getVal('input-visual').trim() || '밝은 캐러멜 주황색의 머리 / 밝은 회색눈 / 뾰족한 송곳니 / 가느다랗고 길쭉한 체형';
+      document.getElementById('target-visual').innerHTML = getVal('input-visual').trim() || '';
       document.getElementById('target-ability').innerHTML = getVal('input-ability').trim() || '[능력 프로필을 입력하세요]';
       document.getElementById('target-management').innerHTML = getVal('input-management').trim() || '[관리 기록 및 운용 로그를 입력하세요]';
       document.getElementById('target-file-doc').innerText = getVal('input-file-doc').trim() || 'DOC';
@@ -657,7 +655,7 @@
       const placeholderNode = document.getElementById(placeholderId);
 
       if (url.trim()) {
-        imgNode.removeAttribute('src'); // 기존 속성 제거 후 설정
+        imgNode.removeAttribute('src');
         imgNode.src = url;
         imgNode.style.display = 'block';
         if (placeholderNode) placeholderNode.style.display = 'none';
@@ -688,23 +686,25 @@
       }
     }
 
-    // 예외 처리가 강화된 이미지 다운로드 함수
     function downloadImage() {
       const node = document.getElementById('card-container');
+      const wrapper = document.getElementById('card-wrapper');
       
-      const currentTransform = node.style.transform;
+      // 캡처 시 스케일 변환 문제 차단을 위해 스타일 일시 초기화
+      const originalTransform = node.style.transform;
+      const originalWrapperHeight = wrapper.style.height;
+      
       node.style.transform = 'none';
+      wrapper.style.height = 'auto';
 
-      // 투명 1px 이미지 데이터 (src가 없거나 캡처 에러 방지용)
       const emptyPixel = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
       htmlToImage.toPng(node, {
         pixelRatio: 2,
         cacheBust: true,
-        skipFonts: true, // 외부 폰트 렌더링 에러 차단
-        imagePlaceholder: emptyPixel, // 이미지 로드 실패 시 대체 이미지 설정
+        skipFonts: true,
+        imagePlaceholder: emptyPixel,
         filter: (element) => {
-          // src 속성이 없는 <img> 태그는 캡처 연산에서 오작동을 방지하기 위해 필터링
           if (element.tagName === 'IMG' && (!element.src || element.src === window.location.href)) {
             return false;
           }
@@ -712,7 +712,8 @@
         }
       })
       .then(function (dataUrl) {
-        node.style.transform = currentTransform;
+        // 원래 상태로 즉시 복원
+        adjustScale();
 
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         const name = document.getElementById('input-name').value.trim() || 'card';
@@ -730,9 +731,9 @@
         }
       })
       .catch(function (error) {
-        node.style.transform = currentTransform;
+        adjustScale();
         console.error('이미지 저장 실패:', error);
-        alert('이미지 생성에 실패했습니다. (로컬 파일 대신 URL 이미지를 사용하거나 문자를 변경해 보세요)');
+        alert('이미지 생성에 실패했습니다.');
       });
     }
 
@@ -745,10 +746,10 @@
       const rawHTML = cardNode.outerHTML;
       
       navigator.clipboard.writeText(rawHTML).then(() => {
-        showToast("이동하복사완료");
+        showToast("HTML 코드가 클립보드에 복사되었습니다!");
       }).catch(err => {
         console.error('복사 실패:', err);
-        alert('삐빅상태불량');
+        alert('복사에 실패했습니다.');
       });
     }
 
