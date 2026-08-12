@@ -585,38 +585,40 @@
     }
 
     function updateText() {
-      const getVal = id => document.getElementById(id).value;
-      
-      const mainClass = getVal('input-class').trim();
+    const getVal = id => document.getElementById(id).value;
+    
+    const mainClass = getVal('input-class').trim();
 
-      document.getElementById('target-name').innerText = getVal('input-name').trim() || 'NAME';
-      document.getElementById('target-subname').innerText = getVal('input-name').trim() || 'NAME';
-      document.getElementById('target-class').innerText = mainClass || '[CLASS // UNIT]';
+    document.getElementById('target-name').innerText = getVal('input-name').trim() || 'NAME';
+    document.getElementById('target-subname').innerText = getVal('input-name').trim() || 'NAME';
+    document.getElementById('target-class').innerText = mainClass || '[CLASS // UNIT]';
 
-      const targetSubclassNode = document.getElementById('target-subclass');
-      if (mainClass) {
-        targetSubclassNode.innerText = mainClass;
-      } else {
-        targetSubclassNode.innerText = '[CLASS]';
-      }
-
-      document.getElementById('target-slogan').innerText = getVal('input-slogan').trim() || '[슬로건 문구를 입력하세요]';
-      document.getElementById('target-sys-left').innerText = getVal('input-sys-left').trim() || '▲ SYS_00';
-      
-      document.getElementById('target-gender').innerText = getVal('input-gender').trim() || '';
-      document.getElementById('target-height').innerText = getVal('input-height').trim() || '';
-      document.getElementById('target-age').innerText = getVal('input-age').trim() || '';
-      document.getElementById('target-nation').innerText = getVal('input-nation').trim() || '';
-      
-      document.getElementById('target-visual').innerHTML = getVal('input-visual').trim() || '';
-      document.getElementById('target-ability').innerHTML = getVal('input-ability').trim() || '[능력 프로필을 입력하세요]';
-      document.getElementById('target-management').innerHTML = getVal('input-management').trim() || '[관리 기록 및 운용 로그를 입력하세요]';
-      document.getElementById('target-file-doc').innerText = getVal('input-file-doc').trim() || 'WON-05';
-      document.getElementById('target-story-highlight').innerHTML = getVal('input-story-highlight').trim() || '[스토리 강조 요약 문구를 입력하세요]';
-      document.getElementById('target-story').innerHTML = getVal('input-story').trim() || '[스토리 본문 내용을 입력하세요]';
-      document.getElementById('target-data1').innerHTML = getVal('input-data1').trim() || '[추가 세부 데이터 01]';
-      document.getElementById('target-data2').innerHTML = getVal('input-data2').trim() || '[추가 세부 데이터 02]';
+    // 앞부분만 출력
+    const targetSubclassNode = document.getElementById('target-subclass');
+    if (mainClass) {
+      const classOnly = mainClass.split('//')[0].trim();
+      targetSubclassNode.innerText = classOnly || '[CLASS]';
+    } else {
+      targetSubclassNode.innerText = '[CLASS]';
     }
+
+    document.getElementById('target-slogan').innerText = getVal('input-slogan').trim() || '[슬로건 문구를 입력하세요]';
+    document.getElementById('target-sys-left').innerText = getVal('input-sys-left').trim() || '▲ SYS_00';
+    
+    document.getElementById('target-gender').innerText = getVal('input-gender').trim() || '';
+    document.getElementById('target-height').innerText = getVal('input-height').trim() || '';
+    document.getElementById('target-age').innerText = getVal('input-age').trim() || '';
+    document.getElementById('target-nation').innerText = getVal('input-nation').trim() || '';
+    
+    document.getElementById('target-visual').innerHTML = getVal('input-visual').trim() || '';
+    document.getElementById('target-ability').innerHTML = getVal('input-ability').trim() || '[능력 프로필을 입력하세요]';
+    document.getElementById('target-management').innerHTML = getVal('input-management').trim() || '[관리 기록 및 운용 로그를 입력하세요]';
+    document.getElementById('target-file-doc').innerText = getVal('input-file-doc').trim() || 'WON-05';
+    document.getElementById('target-story-highlight').innerHTML = getVal('input-story-highlight').trim() || '[스토리 강조 요약 문구를 입력하세요]';
+    document.getElementById('target-story').innerHTML = getVal('input-story').trim() || '[스토리 본문 내용을 입력하세요]';
+    document.getElementById('target-data1').innerHTML = getVal('input-data1').trim() || '[추가 세부 데이터 01]';
+    document.getElementById('target-data2').innerHTML = getVal('input-data2').trim() || '[추가 세부 데이터 02]';
+  }
 
     function updateImageFromUrl(inputId, targetImgId) {
       const url = document.getElementById(inputId).value;
