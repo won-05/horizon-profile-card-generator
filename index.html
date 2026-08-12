@@ -195,7 +195,7 @@
       background: #131722;
       padding: 25px 20px 20px 20px;
       border-radius: 12px;
-      max-width: 95%;
+      max-width: 90%;
       max-height: 90%;
       text-align: center;
       overflow-y: auto;
@@ -375,7 +375,7 @@
 
     <div class="form-group">
       <label>문서 타입(FILE: [이곳 입력])</label>
-      <input type="text" id="input-file-doc" placeholder="기본값: WON-05" oninput="updateText()">
+      <input type="text" id="input-file-doc" placeholder="기본값: DOC" oninput="updateText()">
     </div>
 
     <div class="form-group">
@@ -412,11 +412,11 @@
 
     <div class="btn-group">
       <button class="action-btn save-btn" onclick="downloadImage()">이미지로 저장하기</button>
-      <button class="action-btn copy-btn" onclick="copyHTML()">HTML 코드 복사하기(이미지 URL로 변경하세요)</button>
+      <button class="action-btn copy-btn" onclick="copyHTML()">HTML 코드 복사하기(이미지 URL로 변경하기)</button>
     </div>
   </div>
 
-  <div id="toast" class="toast">HTML 코드가 클립보드에 복사되었습니다!</div>
+  <div id="toast" class="toast">이동하가 복사되었습니다!</div>
 
   <!-- 모바일용 이미지 저장 모달 -->
   <div id="image-modal" class="modal-overlay">
@@ -469,7 +469,11 @@
                 <div id="profile-placeholder" class="img-placeholder c-label" style="height:100%;">프로필 이미지</div>
               </div>
               <div id="target-subname" class="c-val" style="font-size:14px;font-weight:bold;letter-spacing:1px;margin-bottom:6px;word-break:break-all;">NAME</div>
-              <span id="target-subclass" class="c-tag" style="font-size:9px;font-weight:bold;padding:4px 8px;border-radius:4px;display:inline-block;line-height:1.4;word-break:break-word;white-space:normal;max-width:100%;box-sizing:border-box;">[CLASS]</span>
+              
+              <!-- 수정된 CLASS 배지 요소 -->
+              <div style="display:flex;justify-content:center;width:100%;">
+                <span id="target-subclass" class="c-tag" style="font-size:9px;font-weight:bold;padding:5px 8px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;line-height:1.3;word-break:break-word;white-space:normal;max-width:100%;box-sizing:border-box;min-height:22px;text-align:center;">[CLASS]</span>
+              </div>
             </div>
 
             <div class="c-box-soft" style="flex:1;min-width:0;padding:15px;border-radius:10px;font-size:13px;line-height:1.6;display:flex;flex-direction:column;justify-content:center;">
@@ -505,13 +509,13 @@
 
           <!-- STORY LOG -->
           <div class="c-box-bg" style="padding:20px;border-radius:10px;margin-bottom:20px;">
-            <div class="c-border" style="border-bottom-width:1px;border-bottom-style:solid;padding-bottom:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;">
-              <div style="display:block;flex:1;min-width:0;">
-                <div class="c-label" style="font-size:9px;letter-spacing:1px;line-height:1.2;margin-bottom:4px;display:block;">DOCUMENT DOSSIER</div>
-                <div class="c-title" style="font-size:18px;font-weight:bold;line-height:1.1;letter-spacing:0.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">STORY LOG</div>
+            <div class="c-border" style="border-bottom-width:1px;border-bottom-style:solid;padding-bottom:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-end;">
+              <div style="display:flex;flex-direction:column;gap:3px;">
+                <span class="c-label" style="font-size:9px;letter-spacing:1px;line-height:1.2;">DOCUMENT DOSSIER</span>
+                <b class="c-title" style="font-size:18px;line-height:1.2;margin:0;">STORY LOG</b>
               </div>
-              <div class="c-label" style="font-size:9px;white-space:nowrap;line-height:1.2;flex-shrink:0;text-align:right;">
-                FILE: <span id="target-file-doc">WON-05</span> // <span class="c-val" style="font-weight:bold;">RESTRICTED</span>
+              <div class="c-label" style="font-size:10px;white-space:nowrap;line-height:1;">
+                FILE: <span id="target-file-doc">DOC</span> // <span class="c-val" style="font-weight:bold;">RESTRICTED</span>
               </div>
             </div>
             <div style="font-size:13.5px;line-height:1.8;text-align:justify;word-break:keep-all;">
@@ -526,13 +530,13 @@
 
           <!-- DATA.01 & DATA.02 -->
           <div style="display:flex;flex-wrap:nowrap;gap:12px;margin-bottom:25px;">
-            <div class="c-box-bg" style="flex:1;padding:14px;border-radius:8px;min-width:0;">
+            <div class="c-box-bg" style="flex:1;padding:14px;border-radius:8px;">
               <b class="c-label" style="font-size:11px;display:block;margin-bottom:6px;letter-spacing:0.5px;">// DATA.01</b>
-              <div id="target-data1" class="c-val-sub" style="font-size:12px;line-height:1.6;white-space:pre-line;word-break:break-word;">[추가 세부 데이터 01]</div>
+              <div id="target-data1" class="c-val-sub" style="font-size:12px;line-height:1.6;white-space:pre-line;">[추가 세부 데이터 01]</div>
             </div>
-            <div class="c-box-bg" style="flex:1;padding:14px;border-radius:8px;min-width:0;">
+            <div class="c-box-bg" style="flex:1;padding:14px;border-radius:8px;">
               <b class="c-label" style="font-size:11px;display:block;margin-bottom:6px;letter-spacing:0.5px;">// DATA.02</b>
-              <div id="target-data2" class="c-val-sub" style="font-size:12px;line-height:1.6;white-space:pre-line;word-break:break-word;">[추가 세부 데이터 02]</div>
+              <div id="target-data2" class="c-val-sub" style="font-size:12px;line-height:1.6;white-space:pre-line;">[추가 세부 데이터 02]</div>
             </div>
           </div>
 
@@ -585,40 +589,38 @@
     }
 
     function updateText() {
-    const getVal = id => document.getElementById(id).value;
-    
-    const mainClass = getVal('input-class').trim();
+      const getVal = id => document.getElementById(id).value;
+      
+      const mainClass = getVal('input-class').trim();
 
-    document.getElementById('target-name').innerText = getVal('input-name').trim() || 'NAME';
-    document.getElementById('target-subname').innerText = getVal('input-name').trim() || 'NAME';
-    document.getElementById('target-class').innerText = mainClass || '[CLASS // UNIT]';
+      document.getElementById('target-name').innerText = getVal('input-name').trim() || 'NAME';
+      document.getElementById('target-subname').innerText = getVal('input-name').trim() || 'NAME';
+      document.getElementById('target-class').innerText = mainClass || '[CLASS // UNIT]';
 
-    // 앞부분만 출력
-    const targetSubclassNode = document.getElementById('target-subclass');
-    if (mainClass) {
-      const classOnly = mainClass.split('//')[0].trim();
-      targetSubclassNode.innerText = classOnly || '[CLASS]';
-    } else {
-      targetSubclassNode.innerText = '[CLASS]';
+      const targetSubclassNode = document.getElementById('target-subclass');
+      if (mainClass) {
+        targetSubclassNode.innerText = mainClass;
+      } else {
+        targetSubclassNode.innerText = '[CLASS]';
+      }
+
+      document.getElementById('target-slogan').innerText = getVal('input-slogan').trim() || '[슬로건 문구를 입력하세요]';
+      document.getElementById('target-sys-left').innerText = getVal('input-sys-left').trim() || '▲ SYS_00';
+      
+      document.getElementById('target-gender').innerText = getVal('input-gender').trim() || '';
+      document.getElementById('target-height').innerText = getVal('input-height').trim() || '';
+      document.getElementById('target-age').innerText = getVal('input-age').trim() || '';
+      document.getElementById('target-nation').innerText = getVal('input-nation').trim() || '';
+      
+      document.getElementById('target-visual').innerHTML = getVal('input-visual').trim() || '';
+      document.getElementById('target-ability').innerHTML = getVal('input-ability').trim() || '[능력 프로필을 입력하세요]';
+      document.getElementById('target-management').innerHTML = getVal('input-management').trim() || '[관리 기록 및 운용 로그를 입력하세요]';
+      document.getElementById('target-file-doc').innerText = getVal('input-file-doc').trim() || 'DOC';
+      document.getElementById('target-story-highlight').innerHTML = getVal('input-story-highlight').trim() || '[스토리 강조 요약 문구를 입력하세요]';
+      document.getElementById('target-story').innerHTML = getVal('input-story').trim() || '[스토리 본문 내용을 입력하세요]';
+      document.getElementById('target-data1').innerHTML = getVal('input-data1').trim() || '[추가 세부 데이터 01]';
+      document.getElementById('target-data2').innerHTML = getVal('input-data2').trim() || '[추가 세부 데이터 02]';
     }
-
-    document.getElementById('target-slogan').innerText = getVal('input-slogan').trim() || '[슬로건 문구를 입력하세요]';
-    document.getElementById('target-sys-left').innerText = getVal('input-sys-left').trim() || '▲ SYS_00';
-    
-    document.getElementById('target-gender').innerText = getVal('input-gender').trim() || '';
-    document.getElementById('target-height').innerText = getVal('input-height').trim() || '';
-    document.getElementById('target-age').innerText = getVal('input-age').trim() || '';
-    document.getElementById('target-nation').innerText = getVal('input-nation').trim() || '';
-    
-    document.getElementById('target-visual').innerHTML = getVal('input-visual').trim() || '';
-    document.getElementById('target-ability').innerHTML = getVal('input-ability').trim() || '[능력 프로필을 입력하세요]';
-    document.getElementById('target-management').innerHTML = getVal('input-management').trim() || '[관리 기록 및 운용 로그를 입력하세요]';
-    document.getElementById('target-file-doc').innerText = getVal('input-file-doc').trim() || 'WON-05';
-    document.getElementById('target-story-highlight').innerHTML = getVal('input-story-highlight').trim() || '[스토리 강조 요약 문구를 입력하세요]';
-    document.getElementById('target-story').innerHTML = getVal('input-story').trim() || '[스토리 본문 내용을 입력하세요]';
-    document.getElementById('target-data1').innerHTML = getVal('input-data1').trim() || '[추가 세부 데이터 01]';
-    document.getElementById('target-data2').innerHTML = getVal('input-data2').trim() || '[추가 세부 데이터 02]';
-  }
 
     function updateImageFromUrl(inputId, targetImgId) {
       const url = document.getElementById(inputId).value;
@@ -661,11 +663,10 @@
     function downloadImage() {
       const sourceNode = document.getElementById('card-container');
       
-      // 모바일 스케일링 간섭 없이 정확한 580px 크기로 독립 오프스크린 캡처
       const clone = sourceNode.cloneNode(true);
       
       const container = document.createElement('div');
-      container.style.position = 'fixed';
+      container.style.position = 'absolute';
       container.style.left = '-9999px';
       container.style.top = '-9999px';
       container.style.width = '580px';
