@@ -472,7 +472,7 @@
               
               <!-- CLASS 배지 영역 -->
               <div style="display:flex;justify-content:center;width:100%;">
-                <span id="target-subclass" class="c-tag" style="font-size:clamp(7px, 2.2vw, 9.5px);font-weight:bold;padding:4px 6px;border-radius:4px;display:inline-block;width:fit-content;max-width:100%;line-height:1.2;letter-spacing:-0.2px;word-break:break-all;white-space:normal;box-sizing:border-box;min-height:22px;text-align:center;">[CLASS]</span>
+                <span id="target-subclass" class="c-tag" style="font-size:8.5px;font-weight:bold;padding:4px 6px;border-radius:4px;display:inline-block;width:fit-content;max-width:100%;line-height:1.25;letter-spacing:-0.3px;white-space:nowrap;box-sizing:border-box;min-height:22px;text-align:center;">[CLASS]</span>
               </div>
             </div>
 
@@ -606,24 +606,25 @@
           const part1 = mainClass.substring(0, firstSlashIndex).trim();
           const part2 = mainClass.substring(firstSlashIndex + 2).replace(/\/\//g, '').trim();
           
-          targetSubclassNode.innerHTML = `${part1}<br>${part2}`;
+          // 각 줄 내부에서는 절대 줄바꿈이 일어나지 않도록 span으로 감싸기
+          targetSubclassNode.innerHTML = `<span style="display:block;white-space:nowrap;">${part1}</span><span style="display:block;white-space:nowrap;">${part2}</span>`;
           
-          // 글자 수가 길면 폰트 크기를 자동으로 더 축소
+          // 글자 수에 따라 캡처 시에도 안 깨지는 고정 px 폰트 크기 설정
           const maxLen = Math.max(part1.length, part2.length);
           if (maxLen > 14) {
             targetSubclassNode.style.fontSize = '6.5px';
           } else if (maxLen > 10) {
             targetSubclassNode.style.fontSize = '7.5px';
           } else {
-            targetSubclassNode.style.fontSize = 'clamp(7px, 2.2vw, 9.5px)';
+            targetSubclassNode.style.fontSize = '8.5px';
           }
         } else {
-          targetSubclassNode.innerText = mainClass;
-          targetSubclassNode.style.fontSize = mainClass.length > 12 ? '7.5px' : 'clamp(7px, 2.2vw, 9.5px)';
+          targetSubclassNode.innerHTML = `<span style="display:block;white-space:nowrap;">${mainClass}</span>`;
+          targetSubclassNode.style.fontSize = mainClass.length > 12 ? '7.5px' : '8.5px';
         }
       } else {
         targetSubclassNode.innerText = '[CLASS]';
-        targetSubclassNode.style.fontSize = 'clamp(7px, 2.2vw, 9.5px)';
+        targetSubclassNode.style.fontSize = '8.5px';
       }
 
       document.getElementById('target-slogan').innerText = getVal('input-slogan').trim() || '[슬로건 문구를 입력하세요]';
