@@ -412,11 +412,11 @@
 
     <div class="btn-group">
       <button class="action-btn save-btn" onclick="downloadImage()">이미지로 저장하기</button>
-      <button class="action-btn copy-btn" onclick="copyHTML()">HTML 코드 복사하기</button>
+      <button class="action-btn copy-btn" onclick="copyHTML()">HTML 코드 복사하기(이미지 URL로 변경하세요)</button>
     </div>
   </div>
 
-  <div id="toast" class="toast">HTML 코드가 클립보드에 복사되었습니다!</div>
+  <div id="toast" class="toast">이동하 복사 완료</div>
 
   <!-- 모바일용 이미지 저장 모달 -->
   <div id="image-modal" class="modal-overlay">
@@ -424,7 +424,7 @@
       <p>이미지를 <b>길게 눌러서 저장</b>하세요.</p>
       <img id="modal-img" src="" alt="생성된 카드">
       <div>
-        <button class="action-btn close-btn" onclick="closeModal()">✕ 창 닫고 수정하러 가기</button>
+        <button class="action-btn close-btn" onclick="closeModal()">✕ 수정할래염</button>
       </div>
     </div>
   </div>
@@ -506,9 +506,9 @@
           <!-- STORY LOG -->
           <div class="c-box-bg" style="padding:20px;border-radius:10px;margin-bottom:20px;">
             <div class="c-border" style="border-bottom-width:1px;border-bottom-style:solid;padding-bottom:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:flex-end;">
-              <div style="display:flex;flex-direction:row;align-items:baseline;gap:8px;white-space:nowrap;">
-                <span class="c-label" style="font-size:9px;letter-spacing:1px;line-height:1;">DOCUMENT DOSSIER</span>
-                <b class="c-title" style="font-size:18px;line-height:1;margin:0;">STORY LOG</b>
+              <div style="display:flex;flex-direction:column;gap:3px;">
+                <span class="c-label" style="font-size:9px;letter-spacing:1px;line-height:1.2;">DOCUMENT DOSSIER</span>
+                <b class="c-title" style="font-size:18px;line-height:1.2;margin:0;">STORY LOG</b>
               </div>
               <div class="c-label" style="font-size:10px;white-space:nowrap;line-height:1;">
                 FILE: <span id="target-file-doc">DOC</span> // <span class="c-val" style="font-weight:bold;">RESTRICTED</span>
